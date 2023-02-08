@@ -1,13 +1,23 @@
 package at.kaindorf.exam.api;
 
+import at.kaindorf.exam.data.CreationExam;
 import at.kaindorf.exam.database.ExamRepository;
+import at.kaindorf.exam.database.StudentRepository;
+import at.kaindorf.exam.database.SubjectRepository;
 import at.kaindorf.exam.pojos.Exam;
 import at.kaindorf.exam.pojos.Student;
+import at.kaindorf.exam.pojos.Subject;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.lang.reflect.Field;
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,14 +36,89 @@ import java.util.Optional;
 public class ExamController {
 
     private final ExamRepository examRepository;
+    private final SubjectRepository subjectRepository;
+    private final StudentRepository studentRepository;
 
-    public ExamController(ExamRepository examRepository) {
+    public ExamController(ExamRepository examRepository, SubjectRepository subjectRepository, StudentRepository studentRepository) {
         this.examRepository = examRepository;
+        this.subjectRepository = subjectRepository;
+        this.studentRepository = studentRepository;
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<List<Exam>> getExamsFromStudent(@PathVariable Long id) {
         List<Exam> exams = examRepository.findExamsByStudent_StudentIdOrderByDateOfExam(id);
         return exams.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(exams);
+    }
+
+    @PostMapping("/add")
+    public ResponseEntity<Exam> addExam(@RequestBody CreationExam creationExam) {
+        Exam exam = getExamFromCreationExam(creationExam);
+
+        if (examRepository.existsById(exam.getExamId())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+
+        examRepository.save(exam);
+
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(exam.getExamId())
+                .toUri();
+
+        return ResponseEntity.created(location).build();
+    }
+
+    @DeleteMapping("/delete/{examId}")
+    public ResponseEntity<Exam> deleteExam(@PathVariable Long examId) {
+        Optional<Exam> optExam = examRepository.findById(examId);
+
+        if (optExam.isPresent()) {
+            Exam exam = optExam.get();
+            examRepository.delete(exam);
+            return ResponseEntity.ok(exam);
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
+    @PatchMapping
+    public ResponseEntity<Exam> updateExam(@RequestBody CreationExam creationPatch) {
+        Optional<Exam> optExam = examRepository.findById(creationPatch.getExamId());
+        Exam patch = getExamFromCreationExam(creationPatch);
+
+        if (optExam.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        try {
+            Exam exam = optExam.get();
+            for (Field field: Exam.class.getDeclaredFields()) {
+                field.setAccessible(true);
+                Object value = ReflectionUtils.getField(field, patch);
+                if (value != null && !value.toString().trim().isEmpty()) {
+                    ReflectionUtils.setField(field, exam, value);
+                }
+            }
+            examRepository.save(exam);
+            return ResponseEntity.ok(exam);
+        } catch (Exception e) {
+            log.error("Error while updating exam: ", e);
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    private Exam getExamFromCreationExam(CreationExam creationExam) {
+        Exam exam = new Exam();
+        exam.setExamId(creationExam.getExamId());
+        exam.setDateOfExam(creationExam.getDateOfExam());
+        exam.setDuration(creationExam.getDuration());
+
+        Student student = studentRepository.findById(creationExam.getStudentId()).orElse(null);
+        Subject subject = subjectRepository.findById(creationExam.getSubjectId()).orElse(null);
+
+        exam.setStudent(student);
+        exam.setSubject(subject);
+        return exam;
     }
 }

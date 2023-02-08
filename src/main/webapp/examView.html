@@ -12,55 +12,67 @@
 
     <script src="exams.js"></script>
 </head>
-<body onload="loadClassNames()">
+<body onload="loadClassNames(); loadSubjects()">
 <div class="container-fluid">
     <h1>Exam View</h1>
     <label for="classNameSelection"></label>
-    <select class="form-select" onchange="loadStudentsFromClass(this.value)"
+    <select class="form-select" onchange="loadStudents(this.value, 0)"
             id="classNameSelection">
         <option value="0" disabled selected>--- Select Class ---</option>
     </select>
     <br>
-    <label for="studentSelection"></label>
-    <select onchange="loadExamsForStudent(this.value)" class="form-select" id="studentSelection">
-    </select>
 
-    <form>
-        <table class="table">
-            <thead>
-            <tr>
-                <th>Subject</th>
-                <th>Exam-Date</th>
-                <th>Exam-Duration</th>
-                <th></th>
-            </tr>
-            </thead>
-            <tbody id="tbExam">
+    <div id="students">
+        <div id="radStudents">
 
-            </tbody>
-            <tbody>
-            <tr>
-                <td>
-                    <label for="subject"></label>
-                    <input type="text" class="form-control" id="subject">
-                </td>
-                <td>
-                    <label for="examDate"></label>
-                    <input type="date" class="form-control" id="examDate">
-                </td>
-                <td>
-                    <label for="examDuration"></label>
-                    <input type="text" class="form-control" id="examDuration">
-                </td>
-                <td>
-                    <button type="button" class="btn btn-primary" onclick="addExam()">Add Exam</button>
-                </td>
-            </tr>
+        </div>
 
-            </tbody>
-        </table>
+        <nav aria-label="Page navigation example">
+            <ul id="studentPagination" class="pagination">
+            </ul>
+        </nav>
+    </div>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Subject</th>
+            <th>Exam-Date</th>
+            <th>Exam-Duration</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody id="tbExam">
 
-    </form>
+        </tbody>
+        <tbody>
+        <tr>
+            <td>
+                <label for="examId"></label>
+                <input required type="number" id="examId">
+            <td>
+                <label for="subjectSelection"></label>
+                <select required id="subjectSelection">
+
+                </select>
+            </td>
+            <td>
+                <label for="examDate"></label>
+                <input required type="date" id="examDate">
+            </td>
+            <td>
+                <label for="examDuration"></label>
+                <input required type="number" id="examDuration">
+            </td>
+            <td>
+                <label for="examAction"></label>
+                <input disabled value="Add Exam" id="examAction" type="button" class="btn btn-primary"
+                       onclick="addNewExam()">
+            </td>
+        </tr>
+
+        </tbody>
+    </table>
 </div>
 
 </body>
