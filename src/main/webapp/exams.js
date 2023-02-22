@@ -69,7 +69,7 @@ function loadExamsForStudent(studentId) {
 
     console.log('Loading exams for student ' + studentId);
 
-    fetch('./exam/' + studentId)
+    fetch('./exam/student/' + studentId)
         .then(response => {
             document.getElementById('examAction').disabled = false;
             if (response.status === 204) {

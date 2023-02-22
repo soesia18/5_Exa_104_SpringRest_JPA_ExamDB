@@ -35,5 +35,6 @@ public class Student {
     private Classname classname;
 
     @OneToMany(mappedBy = "student")
+    @ToString.Exclude
     private List<Exam> exams = new ArrayList<>();
 }

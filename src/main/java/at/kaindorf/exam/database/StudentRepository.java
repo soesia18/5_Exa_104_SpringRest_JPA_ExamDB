@@ -9,7 +9,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.List;
 
-public interface StudentRepository extends PagingAndSortingRepository<Student, Long>, JpaRepository<Student, Long> {
+public interface StudentRepository extends JpaRepository<Student, Long> {
     List<Student> findStudentsByClassname_ClassIdOrderByLastname (Long classnameId);
     Page<Student> findAllByClassname_ClassId(Long classId, Pageable pageable);
 }

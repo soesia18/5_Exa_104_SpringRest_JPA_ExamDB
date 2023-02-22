@@ -15,7 +15,7 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
-public class CreationExam {
+public class ExamDTO {
     private Long examId;
     private Long studentId;
     private Long subjectId;

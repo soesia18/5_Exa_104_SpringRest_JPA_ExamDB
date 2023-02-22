@@ -1,6 +1,6 @@
 package at.kaindorf.exam.api;
 
-import at.kaindorf.exam.data.CreationExam;
+import at.kaindorf.exam.data.ExamDTO;
 import at.kaindorf.exam.database.ExamRepository;
 import at.kaindorf.exam.database.StudentRepository;
 import at.kaindorf.exam.database.SubjectRepository;
@@ -9,7 +9,6 @@ import at.kaindorf.exam.pojos.Student;
 import at.kaindorf.exam.pojos.Subject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ReflectionUtils;
@@ -45,15 +44,15 @@ public class ExamController {
         this.studentRepository = studentRepository;
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/student/{id}")
     public ResponseEntity<List<Exam>> getExamsFromStudent(@PathVariable Long id) {
         List<Exam> exams = examRepository.findExamsByStudent_StudentIdOrderByDateOfExam(id);
         return exams.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(exams);
     }
 
     @PostMapping("/add")
-    public ResponseEntity<Exam> addExam(@RequestBody CreationExam creationExam) {
-        Exam exam = getExamFromCreationExam(creationExam);
+    public ResponseEntity<Exam> addExam(@RequestBody ExamDTO creationExam) {
+        Exam exam = getExamFromExamDTO(creationExam);
 
         if (examRepository.existsById(exam.getExamId())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
@@ -61,7 +60,7 @@ public class ExamController {
 
         examRepository.save(exam);
 
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+        URI location = ServletUriComponentsBuilder.fromPath("/exam")
                 .path("/{id}")
                 .buildAndExpand(exam.getExamId())
                 .toUri();
@@ -83,9 +82,9 @@ public class ExamController {
     }
 
     @PatchMapping
-    public ResponseEntity<Exam> updateExam(@RequestBody CreationExam creationPatch) {
+    public ResponseEntity<Exam> updateExam(@RequestBody ExamDTO creationPatch) {
         Optional<Exam> optExam = examRepository.findById(creationPatch.getExamId());
-        Exam patch = getExamFromCreationExam(creationPatch);
+        Exam patch = getExamFromExamDTO(creationPatch);
 
         if (optExam.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -108,14 +107,17 @@ public class ExamController {
         }
     }
 
-    private Exam getExamFromCreationExam(CreationExam creationExam) {
+    private Exam getExamFromExamDTO(ExamDTO examDTO) {
         Exam exam = new Exam();
-        exam.setExamId(creationExam.getExamId());
-        exam.setDateOfExam(creationExam.getDateOfExam());
-        exam.setDuration(creationExam.getDuration());
+        exam.setExamId(examDTO.getExamId());
+        exam.setDateOfExam(examDTO.getDateOfExam());
+        exam.setDuration(examDTO.getDuration());
 
-        Student student = studentRepository.findById(creationExam.getStudentId()).orElse(null);
-        Subject subject = subjectRepository.findById(creationExam.getSubjectId()).orElse(null);
+        Student student = studentRepository.findById(examDTO.getStudentId()).orElse(null);
+        Subject subject = subjectRepository.findById(examDTO.getSubjectId()).orElse(null);
+
+        //studentRepository.getReferenceById(examDTO.getStudentId());
+        //examRepository.getMaxExamId() + 1;
 
         exam.setStudent(student);
         exam.setSubject(subject);

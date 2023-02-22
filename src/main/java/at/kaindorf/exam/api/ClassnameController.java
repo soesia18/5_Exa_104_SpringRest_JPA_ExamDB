@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * <h3>Created by IntelliJ IDEA.</h3><br>
@@ -36,7 +37,9 @@ public class ClassnameController {
     @GetMapping("/all")
     public ResponseEntity<List<Classname>> getAllClassnames() {
         log.debug("REST request to get all Classnames");
-        List<Classname> classnames = classnameRepository.findAll(Sort.by("classname"));
+        /* List<Classname> classnames = classnameRepository.findAll(Sort.by("classname")); */
+        List<Classname> classnames = classnameRepository.findAllByOrderByClassname();
+
         return classnames.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(classnames);
     }
 }
