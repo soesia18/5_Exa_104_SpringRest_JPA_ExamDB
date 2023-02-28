@@ -50,11 +50,4 @@ public class StudentController {
         Pageable page = PageRequest.of(pageNo, pageSize, Sort.by("lastname").descending());
         return ResponseEntity.of(Optional.of(studentRepository.findAllByClassname_ClassId(classId, page)));
     }
-
-    @GetMapping("/pageamount/{id}")
-    public ResponseEntity<Integer> getAmountOfStudentsFromClass(@PathVariable Long id) {
-        int amount = studentRepository.findStudentsByClassname_ClassIdOrderByLastname(id).size();
-        int pageAmount = (amount / 10) + 1;
-        return amount == 0 ? ResponseEntity.noContent().build() : ResponseEntity.ok(pageAmount);
-    }
 }
