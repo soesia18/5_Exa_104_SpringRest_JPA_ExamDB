@@ -37,4 +37,8 @@ public class Student {
     @OneToMany(mappedBy = "student")
     @ToString.Exclude
     private List<Exam> exams = new ArrayList<>();
+
+    public void addExam (Exam exam) {
+        this.exams.add(exam);
+    }
 }

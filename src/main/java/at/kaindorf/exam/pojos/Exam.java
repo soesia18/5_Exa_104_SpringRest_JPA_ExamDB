@@ -35,4 +35,14 @@ public class Exam {
     @ManyToOne
     @JoinColumn(name = "subject")
     private Subject subject;
+
+    public void setStudent(Student student) {
+        student.addExam(this);
+        this.student = student;
+    }
+
+    public void setSubject(Subject subject) {
+        subject.addExam(this);
+        this.subject = subject;
+    }
 }

@@ -31,4 +31,8 @@ public class Subject {
     @OneToMany(mappedBy = "subject")
     @JsonIgnore
     private List<Exam> exams;
+
+    public void addExam (Exam exam) {
+        this.exams.add(exam);
+    }
 }

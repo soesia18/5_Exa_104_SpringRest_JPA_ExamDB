@@ -42,20 +42,6 @@ public class StudentController {
         return students.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(students);
     }
 
-    @GetMapping("/{id}/{page}")
-    public ResponseEntity<List<Student>> getStudentsFromClassByClass(@PathVariable Long id, @PathVariable int page) {
-        List<Student> students =
-                studentRepository.findStudentsByClassname_ClassIdOrderByLastname(id);
-
-        if (page > students.size() / 10 + 1 || page < 1) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        students = students.subList(page == 1 ? 0 : (page * 10) - 10, Math.min(students.size(), (page * 10)));
-
-        return students.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(students);
-    }
-
     @GetMapping
     public ResponseEntity<Iterable<Student>> getAllStudents(@RequestParam(value = "classId") Long classId,
                                                         @RequestParam(value = "pageNo", defaultValue = "0") int pageNo,
