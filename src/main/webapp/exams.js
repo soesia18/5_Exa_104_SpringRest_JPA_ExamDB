@@ -221,5 +221,4 @@ function addNewExam() {
                 console.error('Error while adding new exam: ' + response.status + ' ' + response.statusText);
             }
         })
-        .catch(error => console.error(error));
 }

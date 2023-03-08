@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,7 +31,7 @@ public class Subject {
 
     @OneToMany(mappedBy = "subject")
     @JsonIgnore
-    private List<Exam> exams;
+    private List<Exam> exams = new ArrayList<>();
 
     public void addExam (Exam exam) {
         this.exams.add(exam);

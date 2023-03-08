@@ -69,6 +69,8 @@ public class ExamController {
     }
 
     @DeleteMapping("/delete/{examId}")
+
+
     public ResponseEntity<Exam> deleteExam(@PathVariable Long examId) {
         Optional<Exam> optExam = examRepository.findById(examId);
 
